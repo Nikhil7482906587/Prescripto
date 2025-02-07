@@ -1,26 +1,63 @@
 import { createContext, useState } from "react";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
+import axios from "axios";
+import { toast } from "react-toastify";
 
-export const AdminContext = createContext()
+export const AdminContext = createContext();
 
 const AdminContextProvider = (props) => {
+  const [aToken, setAToken] = useState(
+    localStorage.getItem("aToken") ? localStorage.getItem("aToken") : ""
+  );
+  const [doctors, setDoctors] = useState([]);
 
-    const [aToken,setAToken] = useState(localStorage.getItem('aToken')?localStorage.getItem('aToken'):'')
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
-    const value = {
-        aToken,setAToken,
-        backendUrl
+  const getAllDoctors = async () => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + '/api/admin/all-doctors',
+        {},
+        { headers: { aToken } }
+      );
+      if (data.success) {
+        setDoctors(data.doctors);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
-    return (
-        <AdminContext.Provider value={value}>
-            {props.children}
-        </AdminContext.Provider>
-    );
-}
+  };
+  
+  const changeAvailablity = async (docId) => {
+    try {
+      const {data} = await axios.post(backendUrl+'/api/admin/change-availablity',{docId},{headers:{aToken}})
+      if (data.success) {
+        toast.success(data.message);
+        getAllDoctors()
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+  const value = {
+    aToken,
+    setAToken,
+    backendUrl,
+    doctors,
+    getAllDoctors,changeAvailablity,
+  };
+  return (
+    <AdminContext.Provider value={value}>
+      {props.children}
+    </AdminContext.Provider>
+  );
+};
 AdminContextProvider.propTypes = {
-    children: PropTypes.node.isRequired,
+  children: PropTypes.node.isRequired,
 };
 
 export default AdminContextProvider;
