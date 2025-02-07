@@ -1,12 +1,15 @@
 import { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 import RelatedDoctors from "../components/RelatedDoctors";
+import { toast } from "react-toastify";
 
 const Appointment = () => {
   const { docId } = useParams();
-  const { doctors, currencySymbol } = useContext(AppContext);
+  const navigate = useNavigate();
+  const { doctors, currencySymbol, token, backendUrl, getDoctorsData } =
+    useContext(AppContext);
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
   const [docInfo, setDocInfo] = useState(null);
@@ -61,6 +64,30 @@ const Appointment = () => {
         currentDate.setMinutes(currentDate.getMinutes() + 30);
       }
       setDocSlots((prev) => [...prev, timeSlots]);
+    }
+  };
+
+  const bookAppointment = async () => {
+    if (!token) {
+      toast.warn("Login to book appointment");
+      return navigate("/login");
+    }
+
+    try {
+      if (docSlots.length === 0 || !docSlots[slotIndex]) {
+        toast.error("No available slots");
+        return;
+      }
+      const date = docSlots[slotIndex][0].datetime;
+
+      let day = date.getDate();
+      let month = date.getMonth() + 1;
+      let year = date.getFullYear();
+
+      const slotDate = `${day}_${month}_${year}`;
+      console.log(slotDate);
+    } catch (error) {
+      toast.error(error.message)
     }
   };
 
@@ -125,23 +152,44 @@ const Appointment = () => {
         <div className="sm:ml-72 sm:pl-4 mt-4 font-medium text-gray-700">
           <p>Booking Slots</p>
           <div className="flex gap-3 items-center w-full overflow-x-scroll mt-4">
-            {
-              docSlots.length && docSlots.map((item,index)=>(
-                <div onClick={()=>setSlotIndex(index)} className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${slotIndex===index?'bg-blue-600 text-white' : 'border border-gray-400'}`} key={index}>
+            {docSlots.length &&
+              docSlots.map((item, index) => (
+                <div
+                  onClick={() => setSlotIndex(index)}
+                  className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${
+                    slotIndex === index
+                      ? "bg-blue-600 text-white"
+                      : "border border-gray-400"
+                  }`}
+                  key={index}
+                >
                   <p>{item[0] && daysOfWeek[item[0].datetime.getDay()]}</p>
                   <p>{item[0] && item[0].datetime.getDate()}</p>
                 </div>
-              ))
-            }
+              ))}
           </div>
           <div className="flex items-center gap-3 w-full overflow-x-scroll mt-4">
-            {docSlots.length > 0 && docSlots[slotIndex].map((item, index) => (
-              <p onClick={()=>setSlotTime(item.time)} className={`text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer ${item.time === slotTime ? 'bg-blue-600 text-white':'text-gray-400 border border-gray-300'}`} key={index}>
-                {item.time.toLowerCase()}
-              </p>
-            ))}
+            {docSlots.length > 0 &&
+              docSlots[slotIndex].map((item, index) => (
+                <p
+                  onClick={() => setSlotTime(item.time)}
+                  className={`text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer ${
+                    item.time === slotTime
+                      ? "bg-blue-600 text-white"
+                      : "text-gray-400 border border-gray-300"
+                  }`}
+                  key={index}
+                >
+                  {item.time.toLowerCase()}
+                </p>
+              ))}
           </div>
-          <button className="bg-blue-600 text-white text-sm font-light px-14 py-3 rounded-full my-6">Book an Appointment</button>
+          <button
+            onClick={bookAppointment}
+            className="bg-blue-600 text-white text-sm font-light px-14 py-3 rounded-full my-6"
+          >
+            Book an Appointment
+          </button>
         </div>
         {/* listing related doctors */}
         <RelatedDoctors docId={docId} speciality={docInfo.speciality} />
