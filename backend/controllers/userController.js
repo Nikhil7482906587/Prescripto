@@ -1,6 +1,6 @@
 import validator from "validator";
 import razorpay from "razorpay";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { v2 as cloudinary } from "cloudinary";
 import userModel from "../models/userModel.js";
