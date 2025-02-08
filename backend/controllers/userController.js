@@ -1,7 +1,6 @@
 import validator from "validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import razorpay from 'razorpay';
 import { v2 as cloudinary } from "cloudinary";
 import userModel from "../models/userModel.js";
 import doctorModel from "../models/doctorModel.js";
@@ -287,16 +286,6 @@ const cancelAppointment = async (req, res) => {
     });
   }
 };
-
-// API to make payment of appointment using razorpay
-const razorpayInstance = new razorpay({
-  key_id:'',
-  key_secret:'',
-})
-
-// const paymentRazorpay = async (req,res) => {
-
-// }
 
 export {
   registerUser,
