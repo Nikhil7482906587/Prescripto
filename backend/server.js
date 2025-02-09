@@ -14,7 +14,10 @@ const port = process.env.PORT || 4000;
 
 // middlewares
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: process.env.VITE_FRONTEND_URL || process.env.VITE_ADMIN_URL, // Allow requests from your frontend's domain
+  credentials: true,
+}));
 
 // Connect to the database
 connectDB();
