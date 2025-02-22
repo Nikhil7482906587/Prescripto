@@ -7,14 +7,13 @@ import adminRouter from "./routes/adminRoute.js";
 import doctorRouter from "./routes/doctorRoute.js";
 import userRouter from "./routes/userRoute.js";
 
-
 // app config
 const app = express();
 const port = process.env.PORT || 4000;
 
 // middlewares
-app.use(express.json());
-app.use(cors());
+app.use(express.json())
+app.use(cors())
 
 // Connect to the database
 connectDB();
