@@ -13,7 +13,8 @@ const port = process.env.PORT || 4000;
 
 // middlewares
 app.use(express.json())
-app.use(cors())
+app.use(express.urlencoded({extended: true}))
+app.use(cors({origin: "*",credentials: true}))
 
 // Connect to the database
 connectDB();
