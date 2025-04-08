@@ -29,7 +29,7 @@ app.use("/api/doctor", doctorRouter);
 app.use("/api/user", userRouter);
 
 app.get("/", (req, res) => {
-  res.send("Hey Rounak! API is working fine.");
+  res.send("Hey Nikhil! API is working fine.");
 });
 
 // Start the server
